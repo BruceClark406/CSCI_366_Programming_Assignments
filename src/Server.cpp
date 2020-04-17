@@ -49,7 +49,7 @@ void Server::initialize(unsigned int board_size, string p1_setup_board, string p
         this->p1_setup_board.close();
         this->p2_setup_board.close();
 
-        int predicted_board_size = (board_size)*(board_size+1);
+        int predicted_board_size = (board_size)*(board_size+2)-2;
 
 
         if (predicted_board_size != file_length1 && predicted_board_size != file_length2){
