@@ -26,12 +26,8 @@
  */
 
 
-
-
-
 int get_file_length(ifstream *file){
     // ripped this from here: http://www.cplusplus.com/reference/istream/istream/seekg/
-
     file->seekg(0, file->end);
     int length = file->tellg();
     file->close();
@@ -55,6 +51,7 @@ void Server::initialize(unsigned int board_size, string p1_setup_board, string p
 
         int predicted_board_size = (board_size)*(board_size+1);
 
+
         if (predicted_board_size != file_length1 && predicted_board_size != file_length2){
             throw ServerException("Board is not the expected size");
         }
@@ -76,8 +73,7 @@ int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
         return OUT_OF_BOUNDS;
     }
 
-
-    int num_of_char = x * BOARD_SIZE + y;
+    int num_of_char = (BOARD_SIZE + 2) * y + x;
 
     // http://www.cplusplus.com/reference/istream/istream/seekg/
     // https://www.geeksforgeeks.org/set-position-with-seekg-in-cpp-language-file-handling/
@@ -89,14 +85,25 @@ int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
     board_file.read(board_char, 1);
     board_file.close();
 
-
+    cout << ("here is the char " + board_char[0]);
     if (board_char[0] == '_'){
-        p1_setup_board.close();
+        board_file.close();
         return MISS;
     } else{
+        board_file.close();
+        return HIT;
+    }
+
+    /*
+    if ( board_char[0]  != '_' ) {
         p1_setup_board.close();
         return HIT;
     }
+    else {
+        p1_setup_board.close();
+        return MISS;
+    }
+     */
 }
 
 
@@ -126,14 +133,10 @@ int Server::process_shot(unsigned int player) {
         int result = evaluate_shot(player,shot_array[0],shot_array[1]);
 
 
-
-
         // serialize the results to result.json
         ofstream write_result("player_"+to_string(player)+".result.json"); // create an output file stream
         cereal::JSONOutputArchive write_archive(write_result); // initialize an archive on the file
         write_archive(cereal::make_nvp("result", result)); // serialize the data giving it a name
-        // for some reason we do not wait for the file to write or the close the file
-        // per announcement of Mike Wittie
 
         return SHOT_FILE_PROCESSED;
     }
