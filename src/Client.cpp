@@ -26,7 +26,7 @@ void Client::initialize(unsigned int player, unsigned int board_size){
     this->board_size = board_size;
     this->initialized = true;
 
-    // initalize the board array
+    // initialize the board array
     vector<vector<int>> board(board_size, vector<int>(board_size));
 
     //write the board to "player_"+to_string(player)+".action_board.json"
