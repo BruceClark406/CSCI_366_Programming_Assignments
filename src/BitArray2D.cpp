@@ -19,6 +19,14 @@
 
 BitArray2D::BitArray2D(unsigned int rows, unsigned int columns) {
 
+    if ( rows < 1 || columns < 1) {
+        throw BitArray2DException("Out of Bound parameters in bitArray2d.");
+    }
+    this->rows = rows;
+    this->columns = columns;
+    int array_length = ceil(((double)rows * columns)/8);
+    this->array = new char[array_length];
+
 }
 
 
@@ -29,6 +37,10 @@ BitArray2D::~BitArray2D() {
 
 bool BitArray2D::get(unsigned int row, unsigned int column){
    // check array bounds
+    if (row < 0 || column < 0){
+        BitArray2DException("Out of Bound parameters in bitArray get.");
+    }
+
 
    // get the element
    return get_bit_elem(array, columns, row, column);
@@ -37,8 +49,14 @@ bool BitArray2D::get(unsigned int row, unsigned int column){
 
 
 void BitArray2D::set(unsigned int row, unsigned int column){
-   // check array bounds
+    // check array bounds
+
+    if (row < 0 || column < 0){
+        BitArray2DException("Out of Bound parameters in bitArray set.");
+    }
+
+
 
    // set the element
-   set_bit_elem(array, columns, row, column);
+   set_bit_elem(array, this->columns, row, column);
 }

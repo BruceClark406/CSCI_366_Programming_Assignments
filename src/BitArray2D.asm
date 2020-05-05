@@ -1,4 +1,5 @@
 
+
         global  set_bit_elem
         global  get_bit_elem
         section .text
@@ -13,6 +14,13 @@ set_bit_elem:
         ; rcx contains col
 
         ; add your code here
+        imul rsi, rdx
+        add rsi, rcx
+        mov rdi, rsi ; move pointer of array to corect spot
+        mov rdi, 1
+        mov rax, rdi
+
+
 
         mov rsp, rbp        ; restore stack pointer to before we pushed parameters onto the stack
         pop rbp             ; remove rbp from the stack to restore rsp to initial value
@@ -31,7 +39,11 @@ get_bit_elem:
         ; rcx contains col
 
         ; add your code here - for now returning 0
-        mov rax, 0
+        imul rsi, rdx
+        add rsi, rcx
+        mov rdi, rsi ; move pointer of array to corect spot
+        mov rax, rdi
+
 
         mov rsp, rbp        ; restore stack pointer to before we pushed parameters onto the stack
         pop rbp             ; remove rbp from the stack to restore rsp to initial value

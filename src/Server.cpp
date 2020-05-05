@@ -39,22 +39,25 @@ void Server::initialize(unsigned int board_size, string p1_setup_board, string p
 
     // make sure p1 and p2 setup boards exist
     try{
-        this->p1_setup_board.open(p1_setup_board);
-        this->p2_setup_board.open(p2_setup_board);
+        ifstream player1;
+        ifstream player2;
+        player1.open(p1_setup_board);
+        player2.open(p2_setup_board);
         //check size of board
         this->board_size = board_size;
 
-        int file_length1 = get_file_length(&this->p1_setup_board);
-        int file_length2 = get_file_length(&this->p2_setup_board);
-        this->p1_setup_board.close();
-        this->p2_setup_board.close();
+        int file_length1 = get_file_length(&player1);
+        int file_length2 = get_file_length(&player2);
+        player1.close();
+        player2.close();
 
-        int predicted_board_size = (board_size)*(board_size+2)-2;
-
+        int predicted_board_size = (board_size)*(board_size+2);
 
         if (predicted_board_size != file_length1 && predicted_board_size != file_length2){
             throw ServerException("Board is not the expected size");
         }
+        scan_setup_board(p1_setup_board);
+        scan_setup_board(p2_setup_board);
 
 
     }catch (int e){
@@ -68,10 +71,34 @@ Server::~Server() {
 
 
 BitArray2D *Server::scan_setup_board(string setup_board_name){
+    // open file and add onto array
+    ifstream board;
+    board.open(setup_board_name);
+
+
+    for(int i = 0; i < board_size; i++) {
+        for(int j = 0; i < board_size; j++) {
+            // -1 because we want to position before the read
+            //int num_of_char = (BOARD_SIZE + 2) * y + x;
+            // board_file.seekg (num_of_char, board_file.beg);
+            board.seekg((i * board_size) + j - 1, ios::beg);
+            char input;
+            board.read(&input, 1);
+            board.close();
+            if (input != '_'){
+                if (setup_board_name == "player_1.setup_board.txt"){
+                    p1_setup_board->set(i, j);
+                }
+                else{
+                    p2_setup_board->set(i, j);
+                }
+            }
+        }
+    }
+
 }
 
 int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
-
     if (player > MAX_PLAYERS){
         throw ServerException("Too many players...");
     }else if(player <= 0){
@@ -79,6 +106,22 @@ int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
     }else if (x >= BOARD_SIZE or y >= BOARD_SIZE){
         return OUT_OF_BOUNDS;
     }
+
+    char result;
+    if (player == 1){
+        p1_setup_board->get(x, y);
+    }
+    else{
+        p2_setup_board->get(x, y);
+    }
+    if (result == '_'){
+        return MISS;
+    } else{
+        return HIT;
+    }
+
+
+    /*
 
     int num_of_char = (BOARD_SIZE + 2) * y + x;
 
@@ -100,17 +143,9 @@ int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
         board_file.close();
         return HIT;
     }
-
-    /*
-    if ( board_char[0]  != '_' ) {
-        p1_setup_board.close();
-        return HIT;
-    }
-    else {
-        p1_setup_board.close();
-        return MISS;
-    }
      */
+
+
 }
 
 
